@@ -1,6 +1,8 @@
 class Admin::JobsController < ApplicationController
   before_action :authenticate_user!, only: [:new, :create, :update, :edit, :destroy]
   before_action :require_is_admin
+  layout "admin"
+
 
   def show
     @job = Job.find(params[:id])
@@ -51,12 +53,25 @@ class Admin::JobsController < ApplicationController
     params.require(:job).permit(:title, :description, :wage_upper_bound, :wage_lower_bound, :contact_email,:is_hidden)
   end
 
+  def publish
+    @job = Job.find(params[:id])
+    @job.publish!
+
+    redirect_to :back
+  end
+
+  def hide
+    @job = Job.find(params[:id])
+
+    @job.hide!
+
+    redirect_to :back
+  end
+
 def require_is_admin
   if !current_user.admin?
     flash[:alert] = 'You are not admin'
     redirect_to root_path
   end
-
-end
-
+ end
 end
